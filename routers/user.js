@@ -11,7 +11,7 @@ res.json({
 msg:'signin endpoint'
 })
 })
-userRouter.get('/purchase',function(req,res){
+userRouter.get('/purchases ',function(req,res){
 res.json({
 msg:'purchase endpoint'
 })
