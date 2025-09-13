@@ -1,31 +1,12 @@
 const express=require('express')
+const {userRouter}=require('./routers/user')
+const {courseRoute}=require('./routers/course')
 const app=express()
 // create a route for login signin ,purchase the courses,see the all course and see the purched courses
-app.use(express.json())
+app.use("/user",userRouter)
+app.use("/course",courseRouter)
 
-app.post('/user/signup',function(req,res){
-    //signup by using the email and password
-    res.json({
-        msg:'you are signup'
-    })
-})
+createUserRoute(app)
+createCourseRoute(app)
 
-app.post('/user/login',function(req,res){
-res.json({
-    msg:'u are loged in'
-})
-})
-app.post("/course/purchase",function(req,res){
-    res.json({
-
-    })
-})
-app.get('/user/purchase',function(req,res){
-    res.json({
-
-    })
-})
-app.get('/course',function(req,res){
-
-})
 app.listen(3000) 
