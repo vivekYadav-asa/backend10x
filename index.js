@@ -9,4 +9,7 @@ app.use("/api/v1/course",courseRouter)
 app.use("/api/v1/admin",adminRouter)
 
 
-app.listen(3000) 
+app.listen(3000,()=>{
+    console.log('running on port 3000');
+    
+}) 
