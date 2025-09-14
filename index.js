@@ -13,7 +13,7 @@ app.use("/api/v1/admin",adminRouter)
 
 //dotenv
 async function main(){
-await mongoose.connect("mongodb+srv://vivek:kT6JEkzeKHtV%40Ht@cluster0.xmpjrxm.mongodb.net./course-app")
+await mongoose.connect("")
 app.listen(3000,()=>{
     console.log('running on port 3000');
     

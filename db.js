@@ -1,7 +1,7 @@
 //define the schema for users Admin course purchases
 
 const mongoose=require('mongoose')
-mongoose.connect("mongodb+srv://vivek:kT6JEkzeKHtV%40Ht@cluster0.xmpjrxm.mongodb.net./course-app")
+mongoose.connect("")
 const Schema=mongoose.Schema;
 const ObjectId=mongoose.Types.ObjectId
 const userSchema= new Schema({
