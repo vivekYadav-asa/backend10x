@@ -1,8 +1,8 @@
 const {Router}=require('express')
 const adminRouter=Router()
-const {adminModel, userMOdel}=require('../db')
+const {adminModel, userMOdel, courseModel}=require('../db')
 const jwt=require('jsonwebtoken')
-const JWT_ADMIN_PASSWORD='asdas123'
+const {JWT_ADMIN_PASSWORD}=require('../config')
 //bcrypt ,zod 
 adminRouter.post('/signup', async function(req,res){
 const {email,password,firstName,lastName}=req.body;
@@ -48,9 +48,20 @@ res.json({
     message:'this is signin endpoint'
 })
 })
-adminRouter.post('/',function(req,res){
+adminRouter.post('/', adminMiddleware, async function(req,res){
+    const adminId=req.userId
+    const {title ,description,imageUrl,price, cretorId}=req.body
+    const course=await courseModel.create({
+     title,
+     description,
+     imageUrl,
+     price,
+     cretorId
+    })
+
 res.json({
-    message:'this is signin endpoint'
+   message:'course created',
+   courseId:course._id
 })
 })
 adminRouter.put('/',function(req,res){
