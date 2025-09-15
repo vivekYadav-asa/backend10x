@@ -1,7 +1,7 @@
 //define the schema for users Admin course purchases
 
 const mongoose=require('mongoose')
-mongoose.connect("")
+mongoose.connect(process.env.MONGO_URL)
 const Schema=mongoose.Schema;
 const ObjectId=mongoose.Types.ObjectId
 const userSchema= new Schema({
@@ -33,14 +33,39 @@ const purchaseSchema= new Schema({
     userId:ObjectId
 })
 
+
+const contentSchema = new Schema({
+    type: {
+        type: String,
+        enum: ['video', 'image'],
+        required: true
+    },
+    cloudinaryUrl: { 
+        type: String,
+        required: true
+    },
+    cloudinaryPublicId: {
+        type: String,
+        required: true
+    },
+    title: {
+        type: String
+    },
+    description: {
+        type: String
+    }
+});
+
 const userModel=mongoose.model("user",userSchema);
 const adminModel=mongoose.model("admin",adminSchema);
 const courseModel=mongoose.model("course",courseSchema);
 const purchaseModel=mongoose.model("purchase",purchaseSchema);
+const contentModel=mongoose.model("content",contentSchema)
 
 module.exports={
 userModel,
 adminModel,
 courseModel,
-purchaseModel
+purchaseModel,
+contentModel
 }

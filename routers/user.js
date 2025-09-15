@@ -1,9 +1,10 @@
 const {Router}=require('express')
 const userRouter=Router();
+const { userMiddleware}=require('../middleware/user')
 const {userModel, purchaseModel, courseModel}=require('../db')
 const jwt=require('jsonwebtoken')
-import bcrypt from 'bcrypt'
-import z from 'zod'
+const bcrypt =require( 'bcrypt')
+const z=require('zod')
 const{ JWT_USER_PASSWORD}=require('../config')
 userRouter.post('/signup', async function(req,res) {
     const {email,password,firstName,lastName}=req.body;
