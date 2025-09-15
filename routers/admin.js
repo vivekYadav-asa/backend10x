@@ -3,20 +3,47 @@ const adminRouter=Router()
 const {adminModel, userMOdel, courseModel}=require('../db')
 const jwt=require('jsonwebtoken')
 const {JWT_ADMIN_PASSWORD}=require('../config')
+import bcrypt from 'bcrypt'
+import z from 'zod'
+
+
 //bcrypt ,zod 
 adminRouter.post('/signup', async function(req,res){
 const {email,password,firstName,lastName}=req.body;
     //todo:adding zod for validtion
     //todo hash the password so plaintext pw is not stored in the db
     // todo :put inside a try catch block
-     await adminModel.create({
-        email:email,
-        password:password,
-        firstName:firstName,
-        lastName:lastName
+    const reqBody = z.object({
+        email: z.string().email().includes('@'),
+        password: z.string().min(6).max(20),
+        firstName: z.string().min(3).max(50),
+        lastName: z.string().min(3).max(50)
     })
+
+     const parseBodyWithSucess = reqBody.safeParse(req.body)
+    if (!parseBodyWithSucess.success) {
+        res.status(403).json({
+            error: parseBodyWithSucess.error
+        })
+        return
+    }
+
+    //2. Hash the password
+    const hashPassword = await bcrypt.hash(password, 5)
+    try {
+        await adminModel.create({
+            email: email,
+            password: hashPassword,
+            firstName: firstName,
+            lastName: lastName
+        })
+    } catch (e) {
+        console.log("Error: ", e);
+    }
+
+   
 res.json({
-    message:'you are signup succesfully'
+    message:'Admin signed up'
 })
 })
 adminRouter.post('/signin',async function(req,res){
