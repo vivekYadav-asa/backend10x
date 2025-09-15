@@ -46,35 +46,39 @@ res.json({
     message:'Admin signed up'
 })
 })
-adminRouter.post('/signin',async function(req,res){
-    
-      const {email,password}=req.body;
-    const admin=await adminModel.findOne({
-        email:email,
-        password:password
-    });
-    if(admin){
-   const token=jwt.sign({
-    id:admin._id
-   },JWT_ADMIN_PASSWORD)
+adminRouter.post('/signin', async (req, res) => {
+    const { email, password } = req.body;
 
-   res.json({
-    token:token
-})
-
+    //1. Find admin by email only
+    const admin = await adminModel.findOne({
+        email: email
+    })
+    if (!admin) {
+        return res.status(403).json({
+            msg: "Invalid admin"
+        })
     }
 
-else{
+    //2. Check passward using hash
+    const isPasswordValid = await bcrypt.compare(password, admin.password)
+    if (!isPasswordValid) {
+        return res.status(403).json({
+            msg: "Invalid password"
+        })
+    }
 
-res.status(403).json({
-msg:'incorrect credential'
-})
-}
+    //3. sign jwt token
+    const token = jwt.sign({
+        id: admin._id
+    }, JWT_ADMIN_PASSWORD)
 
-res.json({
-    message:'this is signin endpoint'
+    res.json({
+        token: token,
+        msg: "Admin signed in"
+    })
+
 })
-})
+
 adminRouter.post('/course', adminMiddleware, async function(req,res){
     const adminId=req.userId
     const {title ,description,imageUrl,price, cretorId}=req.body
