@@ -48,7 +48,7 @@ res.json({
     message:'this is signin endpoint'
 })
 })
-adminRouter.post('/', adminMiddleware, async function(req,res){
+adminRouter.post('/course', adminMiddleware, async function(req,res){
     const adminId=req.userId
     const {title ,description,imageUrl,price, cretorId}=req.body
     const course=await courseModel.create({
@@ -64,14 +64,35 @@ res.json({
    courseId:course._id
 })
 })
-adminRouter.put('/',function(req,res){
+adminRouter.put('/course',adminMiddleware,async function(req,res){
+  const adminId=req.userId
+    const {title ,description,imageUrl,price, courseId}=req.body
+    const course=await courseModel.updateOne({
+        _id:courseId,
+        cretorId:adminId
+    },
+        {
+     title,
+     description,
+     imageUrl,
+     price,
+     cretorId
+    })
+
 res.json({
-    message:'this is signin endpoint'
+   message:'course updated ',
+   courseId:course._id
 })
+
 })
-adminRouter.get('/course/bulk',function(req,res){
+adminRouter.get('/course/bulk', async function(req,res){
+    const adminId=req.userId;
+    const courses=await courseModel.find({
+        cretorId:adminId
+    })
 res.json({
-    message:'this is signin endpoint'
+    message:'all the courses',
+    courses 
 })
 })
 module.exports={
