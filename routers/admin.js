@@ -144,8 +144,6 @@ adminRouter.post('/course/:courseId/content', adminMiddleware, async (req, res) 
         if (!course) {
             return res.status(404).json({ message: 'Course not found' });
         }
-
-        // Verify that the admin creating the content is the creator of the course
         if (course.cretorId.toString() !== req.userId) {
             return res.status(403).json({ message: 'Unauthorized' });
         }
@@ -153,7 +151,7 @@ adminRouter.post('/course/:courseId/content', adminMiddleware, async (req, res) 
         // Upload to Cloudinary
         const cloudinaryResponse = await cloudinary.uploader.upload(url, {
             resource_type: type === 'video' ? 'video' : 'image',
-            folder: 'course-content' // Optional folder in Cloudinary
+            folder: 'course-content' 
         });
 
         course.content.push({
