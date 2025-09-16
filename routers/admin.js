@@ -6,9 +6,15 @@ const jwt=require('jsonwebtoken')
 const {JWT_ADMIN_PASSWORD}=require('../config')
 const bcrypt =require( 'bcrypt')
 const z=require('zod')
+const cloudinary = require('cloudinary').v2;
 
 
-
+// configure the cloudinary 
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 //bcrypt ,zod 
 adminRouter.post('/signup', async function(req,res){
 const {email,password,firstName,lastName}=req.body;
@@ -128,6 +134,45 @@ res.json({
     courses 
 })
 })
+
+adminRouter.post('/course/:courseId/content', adminMiddleware, async (req, res) => {
+    const { courseId } = req.params;
+    const { type, url, title, description } = req.body;
+
+    try {
+        const course = await courseModel.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ message: 'Course not found' });
+        }
+
+        // Verify that the admin creating the content is the creator of the course
+        if (course.cretorId.toString() !== req.userId) {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        // Upload to Cloudinary
+        const cloudinaryResponse = await cloudinary.uploader.upload(url, {
+            resource_type: type === 'video' ? 'video' : 'image',
+            folder: 'course-content' // Optional folder in Cloudinary
+        });
+
+        course.content.push({
+            type,
+            cloudinaryUrl: cloudinaryResponse.secure_url,
+            cloudinaryPublicId: cloudinaryResponse.public_id,
+            title,
+            description
+        });
+
+        await course.save();
+
+        res.json({ message: 'Content added to course', course });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message }); // Include error message
+    }
+});
+
 module.exports={
     adminRouter:adminRouter
 }
