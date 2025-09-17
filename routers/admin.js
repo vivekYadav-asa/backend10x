@@ -22,7 +22,7 @@ const {email,password,firstName,lastName}=req.body;
     //todo hash the password so plaintext pw is not stored in the db
     // todo :put inside a try catch block
     const reqBody = z.object({
-        email: z.string().email().includes('@'),
+        email: z.string().includes('@'),
         password: z.string().min(6).max(20),
         firstName: z.string().min(3).max(50),
         lastName: z.string().min(3).max(50)
@@ -56,8 +56,6 @@ res.json({
 })
 adminRouter.post('/signin', async (req, res) => {
     const { email, password } = req.body;
-
-    //1. Find admin by email only
     const admin = await adminModel.findOne({
         email: email
     })
@@ -67,7 +65,6 @@ adminRouter.post('/signin', async (req, res) => {
         })
     }
 
-    //2. Check passward using hash
     const isPasswordValid = await bcrypt.compare(password, admin.password)
     if (!isPasswordValid) {
         return res.status(403).json({
@@ -105,6 +102,7 @@ res.json({
 })
 adminRouter.put('/course',adminMiddleware,async function(req,res){
   const adminId=req.userId
+  
     const {title ,description,imageUrl,price, courseId}=req.body
     const course=await courseModel.updateOne({
         _id:courseId,
@@ -114,8 +112,7 @@ adminRouter.put('/course',adminMiddleware,async function(req,res){
      title,
      description,
      imageUrl,
-     price,
-     cretorId
+     price
     })
 
 res.json({
@@ -135,18 +132,19 @@ res.json({
 })
 })
 
-adminRouter.post('/course/:courseId/content', adminMiddleware, async (req, res) => {
+adminRouter.post('/course/:courseId/content',adminMiddleware,  async (req, res) => {
     const { courseId } = req.params;
-    const { type, url, title, description } = req.body;
+  
 
     try {
         const course = await courseModel.findById(courseId);
         if (!course) {
             return res.status(404).json({ message: 'Course not found' });
         }
-        if (course.cretorId.toString() !== req.userId) {
-            return res.status(403).json({ message: 'Unauthorized' });
-        }
+        // if (course.cretorId.toString() !== req.userId) {
+        //     console.log(course.cretorId.toString() )
+        //     return res.status(403).json({ message: 'Unauthorized' });
+        // }
 
         // Upload to Cloudinary
         const cloudinaryResponse = await cloudinary.uploader.upload(url, {
