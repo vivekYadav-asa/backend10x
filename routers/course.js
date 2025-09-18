@@ -17,6 +17,7 @@ courseRouter.get('/preview',function(req,res){
 const courses=courseModel.find({})
 
 res.json({
+    message:'coourse created successfully ',
 courses
 })
 })
